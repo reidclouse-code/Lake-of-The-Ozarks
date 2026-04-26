@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lake of the Ozarks Fishing Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --water-deep: #0a1628;
+    --water-mid: #0d2444;
+    --water-light: #1a3a5c;
+    --water-surface: #1e4976;
+    --gold: #c9973a;
+    --gold-light: #e8b84b;
+    --mist: #d4e9f7;
+    --cream: #f5f0e8;
+    --text-primary: #f0ebe0;
+    --text-secondary: #a8c4d8;
+    --text-muted: #607a8a;
+    --accent-green: #2d7a4f;
+    --accent-green-light: #3a9e65;
+    --card-bg: rgba(13, 36, 68, 0.7);
+    --border: rgba(201, 151, 58, 0.25);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--water-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── ANIMATED WATER BACKGROUND ── */
+  .water-bg {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden;
+    background: linear-gradient(180deg, #040d1a 0%, #0a1628 40%, #0d2444 100%);
+  }
+  .water-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 80%, rgba(26,58,92,0.5) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 30% at 20% 30%, rgba(201,151,58,0.04) 0%, transparent 60%);
+  }
+  .wave {
+    position: absolute; bottom: 0; left: -50%; right: -50%;
+    height: 300px; border-radius: 50%;
+    background: rgba(13, 36, 68, 0.3);
+    animation: wave-drift 12s ease-in-out infinite;
+  }
+  .wave:nth-child(2) { height: 250px; animation-delay: -4s; animation-duration: 16s; background: rgba(26,58,92,0.2); bottom: 20px; }
+  .wave:nth-child(3) { height: 200px; animation-delay: -8s; animation-duration: 20s; background: rgba(201,151,58,0.03); bottom: 40px; }
+  @keyframes wave-drift {
+    0%, 100% { transform: translateX(0) scaleY(1); }
+    50% { transform: translateX(5%) scaleY(1.08); }
+  }
+
+  /* stars */
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 8%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 40% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 5%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 18%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 85% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 35%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 25%, rgba(255,255,255,0.2) 0%, transparent 100%);
+  }
+
+  /* ── LAYOUT ── */
+  .page { position: relative; z-index: 1; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1.5rem;
+    animation: fade-up 0.8s ease both;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    font-weight: 900; line-height: 1.05;
+    color: var(--cream);
+    margin-bottom: 0.5rem;
+    animation: fade-up 0.8s 0.15s ease both;
+  }
+  .hero-title em {
+    font-style: italic; color: var(--gold-light);
+    display: block;
+  }
+  .hero-subtitle {
+    font-size: 1.1rem; font-weight: 300;
+    color: var(--text-secondary); max-width: 500px;
+    line-height: 1.7; margin: 1.5rem auto 3rem;
+    animation: fade-up 0.8s 0.3s ease both;
+  }
+
+  /* ── PLANNER CARD ── */
+  .planner {
+    width: 100%; max-width: 680px;
+    background: rgba(10, 22, 40, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    backdrop-filter: blur(20px);
+    animation: fade-up 0.8s 0.45s ease both;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,151,58,0.15);
+  }
+  .planner-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 400;
+    color: var(--gold-light); margin-bottom: 2rem;
+    letter-spacing: 0.02em;
+  }
+  .planner-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;
+  }
+  @media (max-width: 540px) { .planner-row { grid-template-columns: 1fr; } }
+
+  .field-group { display: flex; flex-direction: column; gap: 6px; }
+  .field-label {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 500;
+  }
+  .field-input {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,151,58,0.2);
+    border-radius: 10px; padding: 0.75rem 1rem;
+    color: var(--text-primary); font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    appearance: none; -webkit-appearance: none;
+    width: 100%;
+  }
+  .field-input:focus { border-color: var(--gold); background: rgba(201,151,58,0.05); }
+  .field-input option { background: #0d2444; color: #f0ebe0; }
+
+  .target-row { margin-bottom: 1.5rem; }
+
+  .fish-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px; margin-top: 6px;
+  }
+  .fish-chip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0.6rem 0.9rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,151,58,0.15);
+    border-radius: 8px; cursor: pointer;
+    transition: all 0.2s; user-select: none;
+    font-size: 13px; color: var(--text-secondary);
+  }
+  .fish-chip:hover { border-color: rgba(201,151,58,0.4); color: var(--cream); background: rgba(201,151,58,0.06); }
+  .fish-chip.active {
+    border-color: var(--gold); background: rgba(201,151,58,0.12);
+    color: var(--cream); font-weight: 500;
+  }
+  .fish-chip .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-muted); flex-shrink: 0; transition: background 0.2s;
+  }
+  .fish-chip.active .dot { background: var(--gold-light); }
+
+  .plan-btn {
+    width: 100%; padding: 1rem;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    border: none; border-radius: 12px;
+    color: var(--water-deep); font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 500; letter-spacing: 0.04em;
+    cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 24px rgba(201,151,58,0.3);
+  }
+  .plan-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,151,58,0.4); }
+  .plan-btn:active { transform: translateY(0); }
+
+  /* ── RESULTS SECTION ── */
+  .results {
+    max-width: 900px; margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+    display: none;
+  }
+  .results.visible { display: block; }
+
+  .results-header {
+    text-align: center; margin-bottom: 3rem;
+    animation: fade-up 0.6s ease both;
+  }
+  .results-eyebrow {
+    font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.75rem;
+  }
+  .results-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700; color: var(--cream);
+    line-height: 1.2;
+  }
+  .results-dates {
+    margin-top: 0.75rem; font-size: 0.95rem;
+    color: var(--text-secondary); font-weight: 300;
+  }
+
+  /* fish cards */
+  .fish-cards { display: flex; flex-direction: column; gap: 2rem; }
+
+  .fish-card {
+    background: rgba(10, 22, 40, 0.8);
+    border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden;
+    backdrop-filter: blur(10px);
+    animation: fade-up 0.6s ease both;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .fish-card-header {
+    padding: 0;
+    border-bottom: 1px solid rgba(201,151,58,0.12);
+    display: flex; flex-direction: column;
+  }
+  .fish-photo-wrap {
+    width: 100%; height: 220px; overflow: hidden;
+    border-radius: 20px 20px 0 0; position: relative;
+    background: rgba(10,22,40,0.8);
+  }
+  .fish-photo-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    object-position: center 40%;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .fish-card:hover .fish-photo-wrap img { transform: scale(1.04); }
+  .fish-photo-wrap::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(10,22,40,0.85) 100%);
+  }
+  .fish-photo-credit {
+    position: absolute; bottom: 6px; right: 10px; z-index: 2;
+    font-size: 10px; color: rgba(255,255,255,0.4);
+  }
+  .fish-header-info {
+    padding: 1.25rem 2rem 1.25rem;
+    display: flex; align-items: flex-start; gap: 1rem;
+  }
+  .fish-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; flex-shrink: 0;
+    background: rgba(201,151,58,0.1); border: 1px solid rgba(201,151,58,0.2);
+  }
+  .fish-card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 700;
+    color: var(--cream); line-height: 1.2;
+  }
+  .fish-card-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 6px; padding: 3px 10px;
+    border-radius: 20px; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+  .status-excellent { background: rgba(45,122,79,0.2); color: #5ec98a; border: 1px solid rgba(45,122,79,0.3); }
+  .status-good { background: rgba(26,73,118,0.3); color: #7ab8e0; border: 1px solid rgba(26,73,118,0.4); }
+  .status-fair { background: rgba(201,151,58,0.15); color: var(--gold-light); border: 1px solid rgba(201,151,58,0.25); }
+
+  .fish-card-body { padding: 1.75rem 2rem; }
+
+  .info-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem; margin-bottom: 1.75rem;
+  }
+  .info-block {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 1rem 1.2rem;
+  }
+  .info-block-label {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.6rem; font-weight: 500;
+  }
+  .info-block-text {
+    font-size: 0.9rem; color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .lures-section { margin-bottom: 1.5rem; }
+  .section-label {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.75rem; font-weight: 500;
+  }
+  .lure-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .lure-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 20px; font-size: 13px;
+    background: rgba(201,151,58,0.08); color: var(--cream);
+    border: 1px solid rgba(201,151,58,0.2);
+  }
+  .lure-tag a {
+    color: var(--gold-light); text-decoration: none; font-size: 11px;
+    border-left: 1px solid rgba(201,151,58,0.3); padding-left: 6px;
+    transition: color 0.2s;
+  }
+  .lure-tag a:hover { color: #fff; }
+
+  .tip-box {
+    background: linear-gradient(135deg, rgba(201,151,58,0.06) 0%, rgba(26,73,118,0.1) 100%);
+    border: 1px solid rgba(201,151,58,0.18);
+    border-radius: 12px; padding: 1rem 1.25rem;
+    font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65;
+    border-left: 3px solid var(--gold);
+  }
+  .tip-box strong { color: var(--gold-light); font-weight: 500; }
+
+  .season-tag {
+    display: inline-block; font-size: 12px;
+    padding: 3px 10px; border-radius: 20px; margin-right: 4px;
+    background: rgba(45,122,79,0.15); color: #5ec98a;
+    border: 1px solid rgba(45,122,79,0.25);
+  }
+  .season-tag.winter { background: rgba(26,73,118,0.2); color: #7ab8e0; border-color: rgba(26,73,118,0.3); }
+  .season-tag.summer { background: rgba(201,151,58,0.12); color: var(--gold-light); border-color: rgba(201,151,58,0.2); }
+  .season-tag.fall { background: rgba(153,60,29,0.15); color: #e8855a; border-color: rgba(153,60,29,0.25); }
+
+  .reg-box {
+    margin-top: 1.25rem;
+    background: rgba(153,60,29,0.08);
+    border: 1px solid rgba(153,60,29,0.2);
+    border-radius: 10px; padding: 0.75rem 1rem;
+    font-size: 12px; color: #e8a090; line-height: 1.6;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .reg-box::before { content: '⚠'; flex-shrink: 0; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    text-align: center; padding: 2rem 0;
+    color: var(--text-muted); font-size: 13px; letter-spacing: 0.1em;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    display: inline-block; width: 80px; height: 1px;
+    background: var(--border); vertical-align: middle; margin: 0 12px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center; padding: 2rem;
+    font-size: 12px; color: var(--text-muted);
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scroll-to-results {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 1.5rem; font-size: 13px; color: var(--gold);
+    text-decoration: none; cursor: pointer; background: none; border: none;
+    animation: bounce 2s infinite;
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); }
+  }
+
+  /* empty state */
+  .empty-state {
+    text-align: center; padding: 3rem 1rem;
+    color: var(--text-muted); font-size: 0.95rem;
+  }
+  .empty-state .big { font-size: 2.5rem; margin-bottom: 0.75rem; }
+</style>
+</head>
+<body>
+
+<div class="water-bg">
+  <div class="stars"></div>
+  <div class="wave"></div>
+  <div class="wave"></div>
+  <div class="wave"></div>
+</div>
+
+<div class="page">
+
+  <!-- HERO + PLANNER -->
+  <section class="hero">
+    <p class="hero-eyebrow">Missouri's Premier Fishing Destination</p>
+    <h1 class="hero-title">
+      Lake of the
+      <em>Ozarks</em>
+    </h1>
+    <p class="hero-subtitle">Plan your perfect fishing trip. Enter your dates, choose your target species, and get expert intel on exactly how to catch them.</p>
+
+    <div class="planner">
+      <p class="planner-title">Plan Your Trip</p>
+
+      <div class="planner-row">
+        <div class="field-group">
+          <label class="field-label" for="arrival">Arrival Date</label>
+          <input class="field-input" type="date" id="arrival">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="departure">Departure Date</label>
+          <input class="field-input" type="date" id="departure">
+        </div>
+      </div>
+
+      <div class="target-row">
+        <p class="field-label" style="margin-bottom:10px">Target Species — select all that apply</p>
+        <div class="fish-grid" id="fishGrid">
+          <div class="fish-chip" data-fish="largemouth"><span class="dot"></span>Largemouth Bass</div>
+          <div class="fish-chip" data-fish="spotted"><span class="dot"></span>Spotted Bass</div>
+          <div class="fish-chip" data-fish="crappie"><span class="dot"></span>Crappie</div>
+          <div class="fish-chip" data-fish="catfish"><span class="dot"></span>Catfish</div>
+          <div class="fish-chip" data-fish="walleye"><span class="dot"></span>Walleye</div>
+          <div class="fish-chip" data-fish="whitebass"><span class="dot"></span>White Bass</div>
+          <div class="fish-chip" data-fish="bluegill"><span class="dot"></span>Bluegill</div>
+          <div class="fish-chip" data-fish="striper"><span class="dot"></span>Striped Bass</div>
+          <div class="fish-chip" data-fish="paddlefish"><span class="dot"></span>Paddlefish</div>
+        </div>
+      </div>
+
+      <button class="plan-btn" onclick="generatePlan()">Generate My Fishing Plan →</button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="results" id="results">
+    <div class="results-header">
+      <p class="results-eyebrow">Your Personalized Guide</p>
+      <h2 class="results-title" id="resultsTitle">Your Fishing Plan</h2>
+      <p class="results-dates" id="resultsDates"></p>
+    </div>
+    <div class="fish-cards" id="fishCards"></div>
+  </section>
+
+  <footer class="footer">
+    Data sourced from Missouri Department of Conservation Annual Prospects Report & Lake of the Ozarks Sunrise Beach Fishing Guide &nbsp;·&nbsp; Always verify current regulations with MDC before fishing
+  </footer>
+
+</div>
+
+<script>
+const FISH_DATA = {
+  largemouth: {
+    name: 'Largemouth Bass',
+    icon: '🐟',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Largemouth_bass_-_Micropterus_salmoides.jpg/800px-Largemouth_bass_-_Micropterus_salmoides.jpg',
+    imgCredit: '© Wikimedia Commons',
+    status: 'excellent',
+    statusLabel: 'Excellent 2026',
+    outlook: '20% of sampled fish are above the 15-inch minimum length limit, with a solid representation of 3–5 lb fish. The spring 2025 year class of 10–12 inch fish is expected to reach harvestable size in 2026, creating a significant surge in catchable fish. All fish are in excellent condition thanks to strong forage availability.',
+    bestTimes: 'Spring and fall are peak seasons. Low-light periods (dawn and dusk) are best for topwater action. Winter is also surprisingly productive with slow presentations.',
+    bestSpots: 'Niangua and Glaize Arms are top producers. Target points, brush piles, boat docks, and gravel banks. Creek arms for deeper fish in summer.',
+    seasons: ['spring', 'fall', 'winter'],
+    lures: [
+      { name: 'Topwater baits', note: 'At dawn/dusk', link: 'https://www.amazon.com/PLUSINNO-Including-Crankbaits-Spinnerbaits-Topwater/dp/B08DP3NDLY' },
+      { name: 'Plastic worms', link: 'https://www.amazon.com/Pearl-FLUKES-Fishing-Plastic-Jerkbaits/dp/B0D9ZPLZ9B' },
+      { name: 'Jigs', link: 'https://www.amazon.com/spinnerbaits-bass/s?k=spinnerbaits+for+bass' },
+      { name: 'Crankbaits', link: 'https://www.amazon.com/Band-Crankbait-Accessories-Chartreuse-BDT3A28/dp/B000LF5IWY' },
+      { name: 'Spinnerbaits', link: 'https://www.amazon.com/spinnerbaits-bass/s?k=spinnerbaits+for+bass' },
+      { name: 'Jerkbaits', note: 'Winter/cold water', link: 'https://www.amazon.com/Codaicen-Fishing-jerkbaits-Bass-suspending/dp/B0845M6HKN' },
+    ],
+    tip: '<strong>Pro tip:</strong> In winter, slowly fish jerkbaits off points and gravel banks. In summer, switch to deep-diving crankbaits along ledges during low-light periods. New brush piles were added to the Gravois Arm this year — use the MDC brush pile map to find them.',
+    regulation: 'Minimum length limit: 15 inches. Catch-and-release recommended for fish over 18 inches to preserve the trophy fishery.'
+  },
+  spotted: {
+    name: 'Spotted (Kentucky) Bass',
+    icon: '🎣',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Micropterus_punctulatus.jpg/800px-Micropterus_punctulatus.jpg',
+    imgCredit: '© Wikimedia Commons',
+    status: 'good',
+    statusLabel: 'Good',
+    outlook: 'Spotted bass make up about 15% of the total black bass catch. Fewer fish are over the 12-inch minimum length limit compared to largemouth, but all fish collected were in excellent condition. Rocky, clearer creek arms are where they concentrate.',
+    bestTimes: 'Spring and fall. Rocky points in the Niangua Arm year-round.',
+    bestSpots: 'The Niangua Arm is the top spot — it has the rocky, clearer water that spotted bass prefer. Also look in Ozark bass habitat in feeder creeks.',
+    seasons: ['spring', 'fall'],
+    lures: [
+      { name: 'Jigs', link: 'https://www.amazon.com/spinnerbaits-bass/s?k=spinnerbaits+for+bass' },
+      { name: 'Crankbaits', link: 'https://www.amazon.com/Crankbait-Fishing-Freshwater-Saltwater-Swimbaits/dp/B095KX38NY' },
+      { name: 'Soft plastics', link: 'https://www.amazon.com/Pearl-FLUKES-Fishing-Plastic-Jerkbaits/dp/B0D9ZPLZ9B' },
+      { name: 'Spinnerbaits', link: 'https://www.amazon.com/spinnerbaits-bass/s?k=spinnerbaits+for+bass' },
+    ],
+    tip: '<strong>Pro tip:</strong> Fish rocky outcroppings and points in the clearer sections of the Niangua Arm. Spotted bass are more structure-oriented than largemouth — work jigs slowly along rock faces and ledges.',
+    regulation: 'Minimum length limit: 12 inches.'
+  },
+  crappie: {
+    name: 'Crappie',
+    icon: '🐠',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pomoxis_nigromaculatus.jpg/800px-Pomoxis_nigromaculatus.jpg',
+    imgCredit: '© Wikimedia Commons',
+    status: 'excellent',
+    statusLabel: 'Excellent 2026',
+    outlook: 'Crappie fishing is expected to be excellent in 2026. Approximately 60% of both black and white crappie sampled in fall 2025 were just under the 9-inch minimum, and they are expected to reach harvestable length by late spring 2026. White crappie made up 70% of the catch; black crappie favor the clearer water sections.',
+    bestTimes: 'Late spring 2026 is the prime window — the fall 2025 year class will be harvestable. Focus on spawning flats in early spring. Deep brush in summer.',
+    bestSpots: 'Creek channels in the bays in spring. Brush piles on and near points in late spring and fall — especially the Gravois Arm, where new brush piles were added. Clear water sections for black crappie.',
+    seasons: ['spring', 'fall', 'summer'],
+    lures: [
+      { name: 'Small jigs (1/32–1/8 oz)', link: 'https://www.amazon.com/Crappie-Baits-Plastics-Jig-Heads-Kit-Shad-Minnow-Fishing-Lures-Crappie-Panfish-Bluegill-40-135-Piece/dp/B0BVVQXM5H' },
+      { name: 'Live minnows', note: 'Under bobbers' },
+      { name: 'Marabou jigs', link: 'https://www.amazon.com/Crappie-Fishing-Marabou-Walleye-Panfish/dp/B0CJDQ13ZL' },
+      { name: 'Deep-diving crankbaits', note: 'Summer trolling', link: 'https://us.amazon.com/Tackle-HD-Square-Bill-Pack/dp/B09861BYRL' },
+    ],
+    tip: '<strong>Pro tip:</strong> Visit the MDC brush pile map at mdc.mo.gov to find exact brush pile GPS locations in the lake, especially the new additions to the Gravois Arm. Vertical jigging near brush piles in 15–25 feet of water is deadly once summer sets in.',
+    regulation: 'Minimum length limit: 9 inches for both black and white crappie. Check MDC for daily bag limits.'
+  },
+  catfish: {
+    name: 'Catfish',
+    icon: '🐡',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Ictalurus_punctatus.jpg/800px-Ictalurus_punctatus.jpg',
+    imgCredit: '© Wikimedia Commons',
+    status: 'good',
+    statusLabel: 'Good Year-round',
+    outlook: 'Catfish fishing on Lake of the Ozarks is consistently good. Blue catfish remain active into fall and can be caught year-round. Channel catfish are plentiful near shorelines. Flathead catfish are present but seldom caught — they require live bait and specific structure.',
+    bestTimes: 'April through September for peak action. Blue cats are active into fall and even winter. Night fishing in summer is highly productive for all species.',
+    bestSpots: 'Blue cats: open water, cove mouths, deep flats, and river channel breaks — fish several feet off the bottom. Channel cats: close to shore on the bottom. Flatheads: near large boulders, woody cover, and feeder rivers.',
+    seasons: ['spring', 'summer', 'fall', 'winter'],
+    lures: [
+      { name: 'Wild Cat Shad Dip Bait', note: 'Blue cats', link: 'https://www.amazon.com/Wild-Cat-Shad-Catfish-Bait/dp/B003OBU5PM' },
+      { name: 'Cut / live shad', note: 'Drift for blue cats' },
+      { name: 'Stink baits & blood baits', note: 'Channel cats', link: 'https://www.amazon.com/catfish-stink-bait/s?k=catfish+stink+bait' },
+      { name: 'Nightcrawlers & liver', note: 'Channel cats' },
+      { name: 'Live bluegill / green sunfish', note: 'Flatheads only' },
+    ],
+    tip: '<strong>Pro tip:</strong> For blue cats, drift with live or cut shad on days with a light breeze — this naturally moves your bait through open water. Keep the bait 3–6 feet off the bottom. For channel cats, keep bait ON the bottom close to the bank.',
+    regulation: '⚠ Blue catfish slot limit: All blue catfish between 26 and 34 inches MUST be immediately released. This has been in effect since 2014.'
+  },
+  walleye: {
+    name: 'Walleye',
+    icon: '🐟',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Walleye_2003.jpg/800px-Walleye_2003.jpg',
+    imgCredit: '© Wikimedia Commons',
+    status: 'good',
+    statusLabel: 'Good — Trophy Potential',
+    outlook: 'Walleye have been consistently stocked in Lake of the Ozarks since the mid-1990s and now maintain a self-sustaining population. They can be found in multiple arms of the lake throughout the year, and the best fishing is in the Niangua, Glaize, and Osage Arms.',
+    bestTimes: 'Early spring in the Truman Dam tailrace is peak. Summer and fall in the main lake arms. Cooler water temperatures trigger the best activity.',
+    bestSpots: 'Truman Dam tailrace in early spring. Grand Glaize, Niangua, and Osage Arms throughout summer and fall. Target steep rocky points and humps — walleye prefer deep structure with a view.',
+    seasons: ['spring', 'summer', 'fall'],
+    lures: [
+      { name: 'Crankbaits', note: 'Troll rocky points', link: 'https://www.amazon.com/Band-Crankbait-Accessories-Chartreuse-BDT3A28/dp/B000LF5IWY' },
+      { name: 'Chartreuse jigs', note: 'Bright colors only', link: 'https://www.amazon.com/Shad-Jig-Heads-Chartreuse-Packs/dp/B00GH15JSY' },
+      { name: 'Orange / white jigs', link: 'https://www.amazon.com/walleye-crankbaits/s?k=walleye+crankbaits' },
+      { name: 'Metal blade baits', link: 'https://www.amazon.com/Fishing-Crankbaits-Swimbaits-Walleye-Saltwater/dp/B09W29KW51' },
+      { name: 'Live minnows / nightcrawlers', note: 'Tip jigs' },
+    ],
+    tip: '<strong>Pro tip:</strong> Unlike bass, walleye strongly prefer bright colors — orange, chartreuse, and white outperform natural patterns. Troll crankbaits slowly along steep rocky points at 1.5–2 mph. At night, walleye move shallower and can be caught on shallow-running lures.',
+    regulation: 'Check MDC for current walleye size and bag limits before your trip.'
+  },
+  whitebass: {
+    name: 'White Bass',
+    icon: '🎣',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Morone_chrysops.jpg/800px-Morone_chrysops.jpg',
+    imgCredit: '© Wikimedia Commons',
+    status: 'fair',
+    statusLabel: 'Fair',
+    outlook: 'White bass fishing should be fair. They provide fast, fun action especially during spring runs. They are often overlooked by anglers focused on bass or crappie, but can produce exciting numbers in the right conditions.',
+    bestTimes: 'Spring runs into tributaries are the most reliable action. Late summer and fall on windy points and sloping structures.',
+    bestSpots: 'Spring: Niangua and Gravois creeks during the spring run — fish below any natural or man-made barriers where fish stack up. Summer/fall: windy points, submerged islands, and long sloping points in the main lake.',
+    seasons: ['spring', 'fall'],
+    lures: [
+      { name: 'Inline spinners', note: 'Spring runs', link: 'https://www.amazon.com/Best-Sellers-Fishing-Spinners-Spinnerbaits/zgbs/sporting-goods/3409661' },
+      { name: 'Jerkbaits', link: 'https://www.amazon.com/jerkbaits-bass-fishing/s?k=jerkbaits+for+bass+fishing' },
+      { name: 'White spinnerbaits', link: 'https://www.amazon.com/white-spinnerbait/s?k=white+spinnerbait' },
+      { name: 'Small shad imitators', link: 'https://www.amazon.com/Pearl-FLUKES-Fishing-Plastic-Jerkbaits/dp/B0D9ZPLZ9B' },
+    ],
+    tip: '<strong>Pro tip:</strong> When white bass are schooling and feeding on the surface (you\'ll see birds diving), cast anything silver or white into the melee and hold on. During spring creek runs, light tackle with 1/4 oz white spinners is extremely effective.',
+    regulation: 'Check MDC for current bag limits. No special length limits currently in effect.'
+  },
+  bluegill: {
+    name: 'Bluegill / Sunfish',
+    icon: '🐠',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Lepomis_macrochirus.jpg/800px-Lepomis_macrochirus.jpg',
+    imgCredit: '© Wikimedia Commons',
+    status: 'fair',
+    statusLabel: 'Abundant but Small',
+    outlook: 'Bluegill are very abundant throughout the lake but tend to run small — less than 10% of sampled fish exceeded 7 inches, and most were under 4 inches. This is largely due to heavy predation by the strong bass population and rocky shorelines lacking aquatic vegetation. Redear sunfish are larger but less common.',
+    bestTimes: 'Spring and early summer when sunfish move shallow to spawn. Beds are easy to spot in clear, shallow coves.',
+    bestSpots: 'Rocky shorelines, dock edges, and any structure with a little shade. Redear sunfish prefer slightly deeper water with mussels and snails on the bottom.',
+    seasons: ['spring', 'summer'],
+    lures: [
+      { name: 'Live worms', note: 'Best producer' },
+      { name: 'Small jigs', link: 'https://www.amazon.com/Crappie-Jigs-Heads-ice-Fishing-Jigheads-Soft-Plastic-Crappie-Trout-Panfish-Sunfish-Fishing-Small/dp/B09J53RTHG' },
+      { name: 'Mini spinners', link: 'https://www.amazon.com/Spinnerbait-Multicolor-Bluegill-Freshwater-Saltwater/dp/B09XWVJ9CZ' },
+      { name: 'Small crickets / grasshoppers', note: 'Live bait' },
+    ],
+    tip: '<strong>Pro tip:</strong> Bluegill are great for kids and light tackle fun. Use ultra-light spinning gear with 4 lb line. If size is a concern, target redear sunfish — they grow larger and can be found in slightly deeper water near the bottom where they feed on snails and mussels.',
+    regulation: 'No minimum length limit. Check MDC for daily bag limits.'
+  },
+  striper: {
+    name: 'Striped / Hybrid Striped Bass',
+    icon: '🐟',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Striped_bass_GLERL.jpg/800px-Striped_bass_GLERL.jpg',
+    imgCredit: '© Wikimedia Commons / NOAA GLERL',
+    status: 'good',
+    statusLabel: 'Good — Trophy Fishery',
+    outlook: 'Hybrid striped bass provide good opportunities in the Truman Dam tailwater and spring-fed areas. True striped bass are stocked in low numbers specifically to provide a trophy fishery — these are elusive, hard-fighting fish that prefer cool, deep, clear water. Patient and skilled anglers can find real trophies here.',
+    bestTimes: 'Summer and winter in spring-fed areas of the lake. Truman Dam tailwater is a year-round option for hybrids.',
+    bestSpots: 'Truman Dam tailwater for hybrid stripers. Spring-fed coves and deep, cool, clear water sections for stripers in summer and winter. Trolling deep open water is the most reliable approach.',
+    seasons: ['summer', 'winter'],
+    lures: [
+      { name: 'Deep trolling lures', note: 'Clear deep water', link: 'https://www.amazon.com/Crankbait-Fishing-Freshwater-Saltwater-Swimbaits/dp/B095KX38NY' },
+      { name: 'Large swimbaits', link: 'https://www.amazon.com/Pearl-FLUKES-Fishing-Plastic-Jerkbaits/dp/B0D9ZPLZ9B' },
+      { name: 'Live shad', note: 'Most effective bait' },
+    ],
+    tip: '<strong>Pro tip:</strong> Stripers follow cold, oxygenated water — use a depth finder to locate thermal stratification layers and troll just above the thermocline in summer. In winter, they congregate in spring-fed areas where the water temperature stays more stable.',
+    regulation: 'Check MDC for current striped bass regulations. These are stocked in limited numbers as a trophy fishery — practice catch-and-release to preserve the population.'
+  },
+  paddlefish: {
+    name: 'Paddlefish',
+    icon: '🦈',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Polyodon_spathula_-_NOAA.jpg/800px-Polyodon_spathula_-_NOAA.jpg',
+    imgCredit: '© NOAA / Public Domain',
+    status: 'good',
+    statusLabel: 'Good — Seasonal',
+    outlook: 'Lake of the Ozarks consistently produces a significant number of paddlefish harvested in Missouri. The Osage Arm is the go-to location during paddlefish season, making Sunrise Beach an ideal base camp. Snagging is the method — no conventional lure fishing applies here.',
+    bestTimes: 'During the designated paddlefish snagging season (typically late winter/early spring — verify exact dates with MDC each year, as seasons change).',
+    bestSpots: 'The Osage Arm of the lake is the primary snagging location. Sunrise Beach is ideally positioned for access to this area.',
+    seasons: ['spring'],
+    lures: [
+      { name: 'Snagging rigs', note: 'Large weighted treble hooks — paddlefish are not caught on bait' },
+      { name: 'Heavy-action rod & reel', note: 'Not a lure — equipment note' },
+    ],
+    tip: '<strong>Pro tip:</strong> Paddlefish are filter feeders and are NOT caught on bait or lures — they must be snagged. Use a heavy rod (7+ feet), large treble hooks (8/0–10/0), and heavy line (50–80 lb). Cast across the current and sweep the rod through the water in slow arcs.',
+    regulation: '⚠ Paddlefish snagging has specific season dates, bag limits, and possession rules that change annually. You MUST check the current MDC regulations before going. A valid Missouri fishing permit is required.'
+  }
+};
+
+function getSeasonFromDate(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  const m = d.getMonth() + 1;
+  if (m >= 3 && m <= 5) return 'spring';
+  if (m >= 6 && m <= 8) return 'summer';
+  if (m >= 9 && m <= 11) return 'fall';
+  return 'winter';
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' });
+}
+
+function getSeasonLabel(s) {
+  return { spring: 'Spring', summer: 'Summer', fall: 'Fall', winter: 'Winter' }[s] || '';
+}
+function getSeasonClass(s) {
+  return { spring: '', summer: 'summer', fall: 'fall', winter: 'winter' }[s] || '';
+}
+
+// Chip selection
+document.querySelectorAll('.fish-chip').forEach(chip => {
+  chip.addEventListener('click', () => chip.classList.toggle('active'));
+});
+
+function generatePlan() {
+  const arrival = document.getElementById('arrival').value;
+  const departure = document.getElementById('departure').value;
+  const selected = [...document.querySelectorAll('.fish-chip.active')].map(c => c.dataset.fish);
+
+  const resultsEl = document.getElementById('results');
+  const cardsEl = document.getElementById('fishCards');
+  const titleEl = document.getElementById('resultsTitle');
+  const datesEl = document.getElementById('resultsDates');
+
+  if (selected.length === 0) {
+    alert('Please select at least one target species.');
+    return;
+  }
+
+  // Title
+  if (selected.length === 1) {
+    titleEl.textContent = `Your ${FISH_DATA[selected[0]].name} Guide`;
+  } else {
+    titleEl.textContent = `Your ${selected.length}-Species Fishing Guide`;
+  }
+
+  // Dates
+  const arrSeason = getSeasonFromDate(arrival);
+  if (arrival && departure) {
+    datesEl.innerHTML = `${formatDate(arrival)} &rarr; ${formatDate(departure)}&nbsp;&nbsp;·&nbsp;&nbsp;Season: <strong>${getSeasonLabel(arrSeason)}</strong>`;
+  } else if (arrival) {
+    datesEl.textContent = `Arriving: ${formatDate(arrival)}`;
+  } else {
+    datesEl.textContent = '';
+  }
+
+  // Build cards
+  cardsEl.innerHTML = '';
+  selected.forEach((fishKey, i) => {
+    const f = FISH_DATA[fishKey];
+    if (!f) return;
+
+    const statusClass = { excellent: 'status-excellent', good: 'status-good', fair: 'status-fair' }[f.status] || 'status-good';
+    const inSeason = arrSeason && f.seasons.includes(arrSeason);
+    const seasonNote = arrSeason
+      ? (inSeason
+          ? `<span class="season-tag ${getSeasonClass(arrSeason)}">✓ In season during your visit</span>`
+          : `<span style="font-size:12px;color:var(--text-muted)">Not peak season during your visit — can still be caught, adjust expectations</span>`)
+      : '';
+
+    const lureTagsHTML = f.lures.map(l => `
+      <span class="lure-tag">
+        ${l.name}${l.note ? `<span style="color:var(--text-muted);font-size:11px"> · ${l.note}</span>` : ''}
+        ${l.link ? `<a href="${l.link}" target="_blank">Amazon ↗</a>` : ''}
+      </span>`).join('');
+
+    const regHTML = f.regulation
+      ? `<div class="reg-box">${f.regulation}</div>` : '';
+
+    cardsEl.innerHTML += `
+      <div class="fish-card" style="animation-delay:${i * 0.1}s">
+        <div class="fish-card-header">
+          <div class="fish-photo-wrap">
+            <img src="${f.img}" alt="${f.name}" loading="lazy" onerror="this.parentElement.style.display='none'">
+            <span class="fish-photo-credit">${f.imgCredit || ''}</span>
+          </div>
+          <div class="fish-header-info">
+            <div class="fish-icon">${f.icon}</div>
+            <div>
+              <h3 class="fish-card-name">${f.name}</h3>
+              <span class="fish-card-status ${statusClass}">${f.statusLabel}</span>
+            </div>
+          </div>
+        </div>
+        <div class="fish-card-body">
+          <div class="info-grid">
+            <div class="info-block">
+              <p class="info-block-label">2026 Outlook</p>
+              <p class="info-block-text">${f.outlook}</p>
+            </div>
+            <div class="info-block">
+              <p class="info-block-label">Best Times</p>
+              <p class="info-block-text">${f.bestTimes}</p>
+              <div style="margin-top:10px">${f.seasons.map(s => `<span class="season-tag ${getSeasonClass(s)}">${getSeasonLabel(s)}</span>`).join('')}</div>
+            </div>
+            <div class="info-block">
+              <p class="info-block-label">Best Spots on the Lake</p>
+              <p class="info-block-text">${f.bestSpots}</p>
+            </div>
+          </div>
+          ${seasonNote ? `<div style="margin-bottom:1.25rem">${seasonNote}</div>` : ''}
+          <div class="lures-section">
+            <p class="section-label">Recommended Lures & Baits</p>
+            <div class="lure-tags">${lureTagsHTML}</div>
+          </div>
+          <div class="tip-box">${f.tip}</div>
+          ${regHTML}
+        </div>
+      </div>`;
+  });
+
+  resultsEl.classList.add('visible');
+  setTimeout(() => {
+    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+// Set default dates to today + 3 days
+const today = new Date();
+const later = new Date(today);
+later.setDate(later.getDate() + 3);
+document.getElementById('arrival').value = today.toISOString().split('T')[0];
+document.getElementById('departure').value = later.toISOString().split('T')[0];
+</script>
+</body>
+</html>
